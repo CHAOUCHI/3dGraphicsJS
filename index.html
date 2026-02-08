@@ -1,0 +1,121 @@
+<canvas >
+
+</canvas>
+
+<script>
+    const HEIGHT = 400;
+    const WIDTH = 400;
+    const BACKGROUND_COLOR = 'lightblue';
+    const FOREGROUND = "purple";
+    const canvas = document.querySelector('canvas');
+    const game = {};
+    const ctx = initContext();
+    const FPS =60;
+    main();
+    
+    let dz = 0.5;
+    function main(){
+        game.height = HEIGHT;
+        game.width = WIDTH;
+        console.log(ctx);
+        refreshFrame();
+       // point(screen({x:0.5,y:0}));
+        //point(screen(project({x:0.5,y:0,z:0.5})));
+        setInterval(frame,1000/FPS);
+        
+    }
+    function frame(){
+        refreshFrame();
+        const dt=1/FPS;
+        dz+=1*dt
+        const matrix = [ 
+            {x:0.5,y:0.5,z:0.5},
+            {x:-0.5,y:0.5,z:0.5},
+            {x:-0.5,y:-0.5,z:0.5},
+            {x:0.5,y:-0.5,z:0.5},
+            
+            {x:0.5,y:0.5,z:-0.5},
+            {x:-0.5,y:0.5,z:-0.5},
+            {x:-0.5,y:-0.5,z:-0.5},
+            {x:0.5,y:-0.5,z:-0.5},
+        ]
+        matrix.map(p=>project({...p,z:p.z+dz})).forEach(p=>point(screen(p)));
+    }
+    function handleMove(){
+         window.addEventListener("keydown",(event)=>{
+            const speed = 0.1;
+            switch (event.key) {
+                case "z":
+                    z+=speed;
+                    break;
+
+                    case "s":
+                        z-=speed;
+                    break;
+                default:
+                    break;
+            }
+            refreshFrame();
+            point(screen(project({x:1,y:1,z:z})));
+        })
+    }
+    function drawRepere(){
+        text("1",screen({x :0.95,y:0}))
+        text("0",screen({x :0,y:0}))
+        text("-1",screen({x :-0.95,y:0}))
+
+        text("1",screen({x :0,y:0.95}))
+        text("-1",screen({x :0,y:-0.95}))
+
+    }
+
+    function project({x,y,z}){
+        return {
+            x : x/z,
+            y : y/z
+        }
+    }
+    function text(text="na",{x,y},textWidth=10){
+        
+        ctx.fillText(text,x,y,textWidth);
+    }
+    /**
+     * Transform point from display(repere cartesien -1..1) 
+     * coord to screen(canvas) coordinates (0..WIDTH)
+     * @param {p} {x:number,y:number}
+    **/ 
+    function screen(p){
+        
+      return {
+        x:(p.x+1)/2*game.width,
+        y:(1-(p.y+1)/2)*game.height
+      };
+    }
+    function refreshFrame(){
+        clear(ctx);
+        drawRepere();
+    }
+    function clear(ctx){
+        const previousFillStyle = ctx.fillStyle;
+        ctx.fillStyle = BACKGROUND_COLOR;
+        ctx.fillRect(0,0,WIDTH,HEIGHT);
+        ctx.fillStyle = previousFillStyle;
+    }
+    function initContext(){
+        canvas.width = WIDTH;
+        canvas.height = HEIGHT;
+        canvas.style.border = '1px solid black';
+        const ctx = canvas.getContext('2d');
+        clear(ctx);
+        return ctx;
+    }
+    function draw(x,y,height=100,width=100,color = FOREGROUND){
+        const previousFillStyle = ctx.fillStyle;
+        ctx.fillStyle = color;
+        ctx.fillRect(x-width/2,y-height/2,width,height);
+        ctx.fillStyle = previousFillStyle;
+    }
+    function point({x,y}){
+        draw(x,y,10,10);
+    }
+</script>
