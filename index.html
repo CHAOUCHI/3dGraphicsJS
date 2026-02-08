@@ -21,7 +21,7 @@
         refreshFrame();
        // point(screen({x:0.5,y:0}));
         //point(screen(project({x:0.5,y:0,z:0.5})));
-        setInterval(frame,1000/FPS);
+        setInterval(frame,10000/FPS);
         
     }
     function frame(){
@@ -33,13 +33,27 @@
             {x:-0.5,y:0.5,z:0.5},
             {x:-0.5,y:-0.5,z:0.5},
             {x:0.5,y:-0.5,z:0.5},
-            
+
             {x:0.5,y:0.5,z:-0.5},
             {x:-0.5,y:0.5,z:-0.5},
             {x:-0.5,y:-0.5,z:-0.5},
             {x:0.5,y:-0.5,z:-0.5},
         ]
-        matrix.map(p=>project({...p,z:p.z+dz})).forEach(p=>point(screen(p)));
+        matrix.map(p=>screen(project({...p,z:p.z+dz}))).forEach((p,i,arr)=>{
+            ctx.beginPath(); // Start a new path
+            ctx.moveTo(p.x, p.y); // Move the pen to (30, 50)
+            stroke(arr)
+            //point(screen(p))
+        });
+    }
+    function stroke(arr){
+        for (const jP of arr) {
+            //if(jP.x!=p.x && jP.y!=p.y) break;
+
+            ctx.lineTo(jP.x, jP.y); // Draw a line to (150, 100)
+            ctx.stroke(); // Render the path
+
+        }
     }
     function handleMove(){
          window.addEventListener("keydown",(event)=>{
