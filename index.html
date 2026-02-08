@@ -1,4 +1,4 @@
-<canvas >
+<canvas id="game" >
 
 </canvas>
 
@@ -7,23 +7,41 @@
     const WIDTH = 400;
     const BACKGROUND_COLOR = 'lightblue';
     const FOREGROUND = "purple";
-    const canvas = document.querySelector('canvas');
-    const game = {};
+    const game = document.querySelector('canvas');
     const ctx = initContext();
-    const FPS =60;
+    const FPS =10;
     
     let dz = 0.5;
     let angle = 0;
     let matrix = [ 
-        {x:0.5,y:0.5,z:0.5},
-        {x:-0.5,y:0.5,z:0.5},
-        {x:-0.5,y:-0.5,z:0.5},
-        {x:0.5,y:-0.5,z:0.5},
+        {x:0.25,y:0.25,z:0.25},
+        {x:-0.25,y:0.25,z:0.25},
+        {x:-0.25,y:-0.25,z:0.25},
+        {x:0.25,y:-0.25,z:0.25},
+
+/*
+        {x:0.125,y:0.125,z:0.5},
+        {x:-0.125,y:0.125,z:0.5},
+        {x:-0.125,y:-0.125,z:0.5},
+        {x:0.125,y:-0.125,z:0.5},
+
+        {x:0.125,y:0.125,z:-0.5},
+        {x:-0.125,y:0.125,z:-0.5},
+        {x:-0.125,y:-0.125,z:-0.5},
+        {x:0.125,y:-0.125,z:-0.5},
+        */
         
-        {x:0.5,y:0.5,z:-0.5},
-        {x:-0.5,y:0.5,z:-0.5},
-        {x:-0.5,y:-0.5,z:-0.5},
-        {x:0.5,y:-0.5,z:-0.5},
+        {x:0.25,y:0.25,z:-0.25},
+        {x:-0.25,y:0.25,z:-0.25},
+        {x:-0.25,y:-0.25,z:-0.25},
+        {x:0.25,y:-0.25,z:-0.25},
+    ]
+
+    let faces = [
+        [0,1,2,3],
+        [4,5,6,7],
+        [0,4,5,1],
+        [2,6,7,3]
     ]
     main();
     function main(){
@@ -33,23 +51,35 @@
         refreshFrame();
        // point(screen({x:0.5,y:0}));
         //point(screen(project({x:0.5,y:0,z:0.5})));
-
-        matrix = matrix.map(vector=>translate_z(vector,6.14));
+        //matrix = matrix.map(vector=>translate_z(vector,6.14));
         setInterval(frame,1000/FPS);
     }
     
     function frame(){
         refreshFrame();
+
         const dt=1/FPS;
         dz+=1*dt
-        angle+=2*Math.PI*dt;
-        for(const v of matrix){
+        angle+=Math.PI*dt;
+        /*for(const v of matrix){
             point(screen(project(
-                rotate_xz(v,angle)
-                //translate_z(v,dz)
+                translate_z(rotate_xz(v,angle),dz)
             )))
             
-            console.log(v)
+        }*/
+        for(face of faces){
+            for (let i = 0; i < face.length; ++i) {         
+                const a = matrix[face[i]];
+                const b = matrix[face[(i+1)%face.length]];
+                line(
+                    screen(project(
+                        translate_z(rotate_xz(a,angle),dz)
+                    )),
+                    screen(project(
+                        translate_z(rotate_xz(b,angle),dz)
+                    ))
+                )
+            }
         }
     }
     function translate_z(v,distance){
@@ -111,7 +141,7 @@
     }
     /**
      * Transform point from display(repere cartesien -1..1) 
-     * coord to screen(canvas) coordinates (0..WIDTH)
+     * coord to screen(game) coordinates (0..WIDTH)
      * @param {p} {x:number,y:number}
     **/ 
     function screen(p){
@@ -132,10 +162,10 @@
         ctx.fillStyle = previousFillStyle;
     }
     function initContext(){
-        canvas.width = WIDTH;
-        canvas.height = HEIGHT;
-        canvas.style.border = '1px solid black';
-        const ctx = canvas.getContext('2d');
+        game.width = WIDTH;
+        game.height = HEIGHT;
+        game.style.border = '1px solid black';
+        const ctx = game.getContext('2d');
         clear(ctx);
         return ctx;
     }
@@ -147,5 +177,13 @@
     }
     function point({x,y}){
         draw(x,y,10,10);
+    }
+    function line(p1,p2){
+        ctx.strokeStyle = FOREGROUND;
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(p1.x,p1.y);
+        ctx.lineTo(p2.x,p2.y);
+        ctx.stroke();
     }
 </script>
