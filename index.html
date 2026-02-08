@@ -33,37 +33,101 @@
     let dz = 0.6;
     let dx = 0;
     let angle = 0;
-    let matrix = [ 
-        {x:0.25,y:0.25,z:0.25},
-        {x:-0.25,y:0.25,z:0.25},
-        {x:-0.25,y:-0.25,z:0.25},
-        {x:0.25,y:-0.25,z:0.25},
+    // let {matrix,faces} = cube();
+    let {matrix,faces} = pyramide();
+    function headCat(){
+        return {
+            matrix : [
+                {x:0.2,y:0.2,z:0.45},
+                {x:-0.2,y:0.2,z:0.45},
+                {x:-0.2,y:-0.2,z:0.45},
+                {x:0.2,y:-0.2,z:0.45},
 
-/*
-        {x:0.125,y:0.125,z:0.5},
-        {x:-0.125,y:0.125,z:0.5},
-        {x:-0.125,y:-0.125,z:0.5},
-        {x:0.125,y:-0.125,z:0.5},
+                {x:0.2,y:0.2,z:0.15},
+                {x:-0.2,y:0.2,z:0.15},
+                {x:-0.2,y:-0.2,z:0.15},
+                {x:0.2,y:-0.2,z:0.15},
+            ],
+            faces : [
+                [0,1,2,3],
+                [4,5,6,7],
+                [0,4,5,1],
+                [2,6,7,3],
+                [1,5,6,2],
+                [0,4,7,3]
+            ]
+        }
+    }
+    function cube(){
+        let matrix = [ 
+            {x:0.25,y:0.25,z:0.25},
+            {x:-0.25,y:0.25,z:0.25},
+            {x:-0.25,y:-0.25,z:0.25},
+            {x:0.25,y:-0.25,z:0.25},
 
-        {x:0.125,y:0.125,z:-0.5},
-        {x:-0.125,y:0.125,z:-0.5},
-        {x:-0.125,y:-0.125,z:-0.5},
-        {x:0.125,y:-0.125,z:-0.5},
-        */
-        
-        {x:0.25,y:0.25,z:-0.25},
-        {x:-0.25,y:0.25,z:-0.25},
-        {x:-0.25,y:-0.25,z:-0.25},
-        {x:0.25,y:-0.25,z:-0.25},
-    ]
+    /*
+            {x:0.125,y:0.125,z:0.5},
+            {x:-0.125,y:0.125,z:0.5},
+            {x:-0.125,y:-0.125,z:0.5},
+            {x:0.125,y:-0.125,z:0.5},
 
-    let faces = [
-        [0,1,2,3],
-        [4,5,6,7],
-        [0,4,5,1],
-        [2,6,7,3]
-    ]
+            {x:0.125,y:0.125,z:-0.5},
+            {x:-0.125,y:0.125,z:-0.5},
+            {x:-0.125,y:-0.125,z:-0.5},
+            {x:0.125,y:-0.125,z:-0.5},
+            */
+            
+            {x:0.25,y:0.25,z:-0.25},
+            {x:-0.25,y:0.25,z:-0.25},
+            {x:-0.25,y:-0.25,z:-0.25},
+            {x:0.25,y:-0.25,z:-0.25},
+        ]
+
+        let faces = [
+            [0,1,2,3],
+            [4,5,6,7],
+            [0,4,5,1],
+            [2,6,7,3]
+        ]
+        return {
+            matrix,
+            faces
+        }
+    }
+
+    function pyramide(){
+        let matrix3 = [
+            // base
+            {x:0.25,y:0.25,z:-0.25},
+            {x:-0.25,y:0.25,z:-0.25},
+            {x:-0.25,y:-0.25,z:-0.25},
+            {x:0.25,y:-0.25,z:-0.25},
+
+            // sommet réduit
+            {x:0.1,y:0.1,z:0.15},
+            {x:-0.1,y:0.1,z:0.15},
+            {x:-0.1,y:-0.1,z:0.15},
+            {x:0.1,y:-0.1,z:0.15},
+        ]
+
+        let faces3 = [
+            [0,1,2,3],      // base
+            [4,5,6,7],      // sommet
+            [0,4,5,1],
+            [1,5,6,2],
+            [2,6,7,3],
+            [3,7,4,0]
+        ]
+
+        return {
+            matrix : matrix3,
+            faces : faces3
+        }
+    }
     main();
+    const objects = [
+        headCat()
+    ]
     function main(){
         game.height = HEIGHT;
         game.width = WIDTH;
@@ -76,15 +140,9 @@
         setInterval(frame,1000/FPS);
 
     }
-    
-    function frame(){
-        refreshFrame();
 
-        const dt=1/FPS;
-        if(isAutoMove)
-            dz+=1*dt
-        if(isAutoRotate)
-            angle+=0.1*Math.PI*dt;
+    function drawMesh(matrix,faces,dx=0,dz=0.6,angle=0){
+        
         /*for(const v of matrix){
             point(screen(project(
                 translate_z(rotate_xz(v,angle),dz)
@@ -108,6 +166,17 @@
                 )
             }
         }
+    }
+    
+    function frame(){
+        refreshFrame();
+
+        const dt=1/FPS;
+        if(isAutoMove)
+            dz+=1*dt
+        if(isAutoRotate)
+            angle+=0.1*Math.PI*dt;
+        objects.forEach(o=>drawMesh(o.matrix,o.faces,dx,dz,angle));
     }
     // deplace un point sur l'axe z (la profondeur)
     function translate_z(v,distance){
