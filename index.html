@@ -11,21 +11,9 @@
     const game = {};
     const ctx = initContext();
     const FPS =60;
+    main();
     
     let dz = 0.5;
-    let angle = 0;
-    let matrix = [ 
-        {x:0.5,y:0.5,z:0.5},
-        {x:-0.5,y:0.5,z:0.5},
-        {x:-0.5,y:-0.5,z:0.5},
-        {x:0.5,y:-0.5,z:0.5},
-        
-        {x:0.5,y:0.5,z:-0.5},
-        {x:-0.5,y:0.5,z:-0.5},
-        {x:-0.5,y:-0.5,z:-0.5},
-        {x:0.5,y:-0.5,z:-0.5},
-    ]
-    main();
     function main(){
         game.height = HEIGHT;
         game.width = WIDTH;
@@ -33,44 +21,33 @@
         refreshFrame();
        // point(screen({x:0.5,y:0}));
         //point(screen(project({x:0.5,y:0,z:0.5})));
-
-        matrix = matrix.map(vector=>translate_z(vector,6.14));
         setInterval(frame,1000/FPS);
+        
     }
-    
     function frame(){
         refreshFrame();
         const dt=1/FPS;
         dz+=1*dt
-        angle+=2*Math.PI*dt;
-        for(const v of matrix){
-            point(screen(project(
-                rotate_xz(v,angle)
-                //translate_z(v,dz)
-            )))
+        const matrix = [ 
+            {x:0.5,y:0.5,z:0.5},
+            {x:-0.5,y:0.5,z:0.5},
+            {x:-0.5,y:-0.5,z:0.5},
+            {x:0.5,y:-0.5,z:0.5},
             
-            console.log(v)
-        }
-    }
-    function translate_z(v,distance){
-        return {
-            x : v.x,
-            y : v.y,
-            z:v.z+distance
-        };
+            {x:0.5,y:0.5,z:-0.5},
+            {x:-0.5,y:0.5,z:-0.5},
+            {x:-0.5,y:-0.5,z:-0.5},
+            {x:0.5,y:-0.5,z:-0.5},
+        ]
+        matrix.map(p=>project({...p,z:p.z+dz})).forEach(p=>point(screen(p)));
     }
 
-    function rotate_xz({x,y,z},angle){
-        /*
-        x' = x*cosO - y*sinO
-        y' = x*sinO + y*cosO
-        */
+    /*function rotate_xy({x,y,z},angle){
         return{
-            x : x*Math.cos(angle) - z*Math.sin(angle),
-            y,
-            z : x*Math.sin(angle) + z*Math.cos(angle)
+            x : x,
+            y : y
         }
-    }
+    }*/
     function handleMove(){
          window.addEventListener("keydown",(event)=>{
             const speed = 0.1;
