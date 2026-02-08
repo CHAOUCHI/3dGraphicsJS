@@ -41,6 +41,13 @@
         ]
         matrix.map(p=>project({...p,z:p.z+dz})).forEach(p=>point(screen(p)));
     }
+
+    /*function rotate_xy({x,y,z},angle){
+        return{
+            x : x,
+            y : y
+        }
+    }*/
     function handleMove(){
          window.addEventListener("keydown",(event)=>{
             const speed = 0.1;
